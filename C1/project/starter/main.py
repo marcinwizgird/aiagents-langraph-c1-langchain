@@ -54,8 +54,10 @@ def main():
     # Load environment variables
     load_dotenv()
 
+
     # Get API key
     api_key = os.getenv("OPENAI_API_KEY")
+    print(f"OPENAI_API_KEY : {api_key}")
     if not api_key:
         print("Error: OPENAI_API_KEY not found in environment variables")
         print("Please create a .env file with your OpenAI API key")

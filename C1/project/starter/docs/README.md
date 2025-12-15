@@ -65,7 +65,7 @@ doc_assistant_project/
 
 The LangGraph agent follows this workflow:
 
-![](./docs/langgraph_agent_architecture.png)
+![](langgraph_agent_architecture.png)
 
 ## Implementation Tasks
 

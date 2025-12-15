@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 import re
 import json
 from datetime import datetime
+import math
 
 
 class ToolLogger:
@@ -66,8 +67,45 @@ def create_calculator_tool(logger: ToolLogger):
     """
     Creates a calculator tool - TO BE IMPLEMENTED
     """
+
     # Your implementation here
-    pass
+    @tool
+    def performCalculation(expression: str) -> str:
+        """
+                Performs a safe mathematical calculation for a given expression.
+                Supports basic arithmetic (+, -, *, /, **) and functions (sqrt, sin, cos, tan, abs, round, min, max, pow).
+                Example input: "3.5 * (10 + 4) / sqrt(16)"
+
+                Args:
+                    expression: The mathematical expression to evaluate. For instance: "3.5 * (10 + 4) / sqrt(16)".
+
+                Returns:
+                    The result of the calculation cast as a string.
+        """
+
+        logger.info(f"Tool called: performCalculation with expression: {expression}")
+
+        safe_locals = {"abs": abs, "round": round, "min": min, "max": max, "pow": pow, "sqrt": math.sqrt,
+                       "sin": math.sin, "cos": math.cos, "tan": math.tan, "log": math.log, "pi": math.pi, "e": math.e}
+
+        allowed_chars = set("0123456789.+-*/()^, abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        cleaned_expr = expression.strip()
+
+        if not all(char in allowed_chars or char.isspace() for char in cleaned_expr):
+            error_msg = "Error: Expression contains invalid characters."
+            logger.error(error_msg)
+            return error_msg
+
+        try:
+            result = eval(cleaned_expr, {"__builtins__": None}, safe_locals)
+            return str(result)
+
+        except Exception as e:
+            error_msg = f"Calculation Error: {str(e)}"
+            logger.error(error_msg)
+            return error_msg
+
+    return performCalculation
 
 
 def create_document_search_tool(retriever, logger: ToolLogger):
@@ -194,7 +232,7 @@ def create_document_search_tool(retriever, logger: ToolLogger):
         except Exception as e:
             error_msg = f"Error searching documents: {str(e)}"
             logger.log_tool_use(
-                "document_search",
+                 "document_search",
                 {"query": query, "search_type": search_type},
                 {"error": error_msg}
             )

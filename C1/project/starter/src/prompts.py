@@ -1,6 +1,5 @@
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate
-
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 def get_intent_classification_prompt() -> PromptTemplate:
     """
@@ -62,7 +61,19 @@ Guidelines:
 
 # Calculation System Prompt
 # TODO: Implement the CALCULATION_SYSTEM_PROMPT. Refer to README.md Task 3.2 for details
-CALCULATION_SYSTEM_PROMPT = """"""
+CALCULATION_SYSTEM_PROMPT = """
+You are a calculation agent. Your primary task is to solve mathematical problems or numerical queries.
+
+Instructions:
+1. Analyze the user's request to identify the mathematical problem.
+2. If the request involves simple arithmetic or defined mathematical functions, formulate the expression as a string (e.g., "5 + 5" or "sqrt(16) * 10").
+3. USE the 'performCalculation' tool to execute the math. Do not calculate it mentally.
+4. If the request requires data from documents *before* calculating (e.g., "What is the profit + revenue?"), use the 'document_search' tool first to find the numbers.
+5. Provide the final answer clearly, identifying the steps you took.
+
+Output Format:
+You must return your response according to the 'CalculationResponse' schema, including the numeric result, the steps taken, and reasoning.
+"""
 
 
 # TODO: Finish the function to return the correct prompt based on intent type
@@ -73,10 +84,10 @@ def get_chat_prompt_template(intent_type: str) -> ChatPromptTemplate:
     """
     if intent_type == "qa":
         system_prompt = QA_SYSTEM_PROMPT
-    elif intent_type ==  # TODO:  Check the intent type value
-        system_prompt =  # TODO: Set system prompt to the correct value based on intent type
-    elif intent_type ==  # TODO: Check the intent type value
-    # TODO: Set system prompt to the correct value based on intent type
+    elif intent_type == "summarization":
+        system_prompt = SUMMARIZATION_SYSTEM_PROMPT
+    elif intent_type == "calculation":
+        system_prompt = CALCULATION_SYSTEM_PROMPT
     else:
         system_prompt = QA_SYSTEM_PROMPT  # Default fallback
 

@@ -32,7 +32,7 @@ class DocumentAssistant:
             api_key=openai_api_key,
             model=model_name,
             temperature=temperature,
-            base_url="https://openai.vocareum.com/v1"
+            #base_url="https://openai.vocareum.com/v1"
         )
 
         # Initialize components
@@ -120,9 +120,9 @@ class DocumentAssistant:
         # Refer to README.md Task 2.6 for details
         config = {
             "configurable": {
-                "thread_id": # TODO: Set this to the session id of the current sessions
-                "llm": # TODO Set this to the LLM instance (self.llm)
-                "tools": # TODO Set this to the list of tools
+                "thread_id": self.current_session.session_id,
+                "llm": self.llm,
+                "tools": self.tools
             }
         }
 
@@ -157,6 +157,7 @@ class DocumentAssistant:
                         final_state["active_documents"]
                     ))
                 self._save_session()
+
             return {
                 "success": True,
                 "response": final_state.get("messages")[-1].content if final_state.get("messages") else None,
@@ -167,6 +168,8 @@ class DocumentAssistant:
                 "summary": final_state.get("conversation_summary", [])
             }
         except Exception as e:
+            print(f"Error processing message: {e}")
+            raise e
             return {
                 "success": False,
                 "error": str(e),
