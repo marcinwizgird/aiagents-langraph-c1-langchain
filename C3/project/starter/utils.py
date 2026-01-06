@@ -8,23 +8,32 @@ from langchain_core.messages import (
     SystemMessage,
     HumanMessage, 
 )
+import gc
+
 from langgraph.graph.state import CompiledStateGraph
 
 
 Base = declarative_base()
 
-def reset_db(db_path: str, echo: bool = True):
-    """Drops the existing udahub.db file and recreates all tables."""
-
+def reset_db(db_path, echo=False):
+    # ... existing code ...
     # Remove the file if it exists
     if os.path.exists(db_path):
-        os.remove(db_path)
-        print(f"✅ Removed existing {db_path}")
-
-    # Create a new engine and recreate tables
-    engine = create_engine(f"sqlite:///{db_path}", echo=echo)
-    Base.metadata.create_all(engine)
-    print(f"✅ Recreated {db_path} with fresh schema")
+        # Force garbage collection to close any dangling connections
+        gc.collect()
+        try:
+            os.remove(db_path)
+            print(f"✅ Removed existing {db_path}")
+        except PermissionError:
+            print(f"⚠️ Could not remove {db_path}. It might be in use.")
+            print("Attempting to wait and retry...")
+            time.sleep(1)
+            try:
+                os.remove(db_path)
+                print(f"✅ Removed existing {db_path} after retry")
+            except PermissionError:
+                 print(f"❌ Failed to remove {db_path}. Please restart the kernel to release the file lock.")
+                 raise
 
 
 @contextmanager

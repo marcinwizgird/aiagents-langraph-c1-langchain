@@ -26,12 +26,20 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
+    memories = relationship("UserMemory", back_populates="user")
     subscription = relationship("Subscription", back_populates="user", uselist=False)
     reservations = relationship("Reservation", back_populates="user")
 
     def __repr__(self):
         return f"<User(user_id='{self.user_id}', email='{self.email}', is_blocked={self.is_blocked})>"
 
+class UserMemory(Base):
+    """Long-Term Memory / Context"""
+    __tablename__ = "user_memories"
+    memory_id = Column(String, primary_key=True)
+    user_id = Column(String, ForeignKey("users.user_id"))
+    content = Column(String, nullable=False)
+    user = relationship("User", back_populates="memories")
 
 class Subscription(Base):
     __tablename__ = "subscriptions"
